@@ -20,7 +20,7 @@ InputMicBlow *Input::input_mic_blow;
 
 Input::Input() {
     HID_UPDATE_INTERVAL.tv_sec = 0;
-    HID_UPDATE_INTERVAL.tv_nsec = (__syscall_slong_t) floor(1000000000. / 180.);
+    HID_UPDATE_INTERVAL.tv_nsec = (__syscall_slong_t) 5 * 1000 * 1000;
     packet = new InputPacketHeaderWiiU();
     clock_gettime(CLOCK_MONOTONIC_RAW, &last_sent_time);
     input_button = new InputButton();
@@ -46,6 +46,12 @@ void Input::update() {
     if (delta.tv_sec > 0 or delta.tv_nsec >= HID_UPDATE_INTERVAL.tv_nsec) {
         clock_gettime(CLOCK_MONOTONIC_RAW, &last_sent_time);
         send_hid_update();
+    } else {
+        timespec rem = {
+          .tv_sec = 0,
+          .tv_nsec = HID_UPDATE_INTERVAL.tv_nsec - delta.tv_nsec,
+        };
+        nanosleep(&rem, NULL);
     }
 }
 
