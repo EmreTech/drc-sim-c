@@ -55,17 +55,17 @@ void VideoHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockadd
         uint8_t *nals = new uint8_t[frame_index * 2];
         int nals_size = h264_nal_encapsulate(is_idr, frame, frame_index, nals);
 
-        uint8_t *image_rgb = new uint8_t[2000000]; // ~2 megabytes
-        decoder.image(nals, nals_size, image_rgb);
+        //uint8_t *image_rgb = new uint8_t[2000000]; // ~2 megabytes
+        //decoder.image(nals, nals_size, image_rgb);
 
-        uint8_t *image_jpeg = new uint8_t[2000000];
-        int image_size_jpeg = ImageUtil::rgb_to_jpeg(image_rgb, image_jpeg);
+        //uint8_t *image_jpeg = new uint8_t[2000000];
+        //int image_size_jpeg = ImageUtil::rgb_to_jpeg(image_rgb, image_jpeg);
 
-        Server::broadcast_video(image_jpeg, (size_t) image_size_jpeg);
+        Server::broadcast_video(nals, (size_t) nals_size);
 
         delete [] nals;
-        delete [] image_rgb;
-        delete [] image_jpeg;
+        //delete [] image_rgb;
+        //delete [] image_jpeg;
     }
     else if (video_packet.header.frame_end and !is_streaming) {
         Logger::debug(Logger::VIDEO, "Skipping video frame");

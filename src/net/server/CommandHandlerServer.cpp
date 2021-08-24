@@ -51,10 +51,8 @@ void CommandHandlerServer::pong(sockaddr_in *address, unsigned int *address_size
     CommandPacketHeaderServer header;
     header.type = htons(CommandPacketServer::COMMAND_PONG);
     header.payload_size = htons(0);
-    ssize_t sent = sendto(Server::socket_cmd, &header, sizeof(CommandPacketHeaderServer), 0, (sockaddr *) address,
-                          *address_size);
-    if (sent == -1)
+    /*ssize_t sent = sendto(Server::socket_cmd, &header, sizeof(CommandPacketHeaderServer), 0, (sockaddr *) address,
+                          *address_size);*/
+    if (0)
         Logger::error(Logger::SERVER, "Error sending pong command.");
 }
-
-
