@@ -8,7 +8,6 @@
 
 #include "../PacketHandler.h"
 #include "packet/VideoPacketWiiU.h"
-#include "../../data/H264Decoder.h"
 
 class VideoHandlerWiiU : PacketHandler {
 
@@ -28,7 +27,6 @@ private:
 
     uint8_t *frame;
     int frame_decode_num;
-    H264Decoder decoder;
 };
 
 

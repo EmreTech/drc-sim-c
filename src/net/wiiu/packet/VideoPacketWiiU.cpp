@@ -7,7 +7,6 @@
 #include <assert.h>
 #include <cstring>
 #include "VideoPacketWiiU.h"
-#include "../../../util/BitUtil.h"
 #include "../../../util/logging/Logger.h"
 
 using namespace std;
