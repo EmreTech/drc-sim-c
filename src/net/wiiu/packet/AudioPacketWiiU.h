@@ -11,14 +11,13 @@
 
 #pragma pack(1)
 typedef struct {
-    unsigned format : 3;
-    bool mono : 1;
-    bool vibrate : 1;
-    unsigned type : 1;
-    unsigned seq_id : 10;
-    unsigned payload_size : 16;
-    unsigned timestamp : 32;
-    unsigned char payload[2048];
+    unsigned format;
+    bool mono;
+    bool vibrate;
+    unsigned type;
+    unsigned seq_id;
+    unsigned payload_size;
+    unsigned timestamp;
 } AudioPacketHeaderWiiU;
 #pragma pack(0)
 
@@ -33,10 +32,12 @@ class AudioPacketWiiU : Packet {
 public:
     AudioPacketWiiU(unsigned char *packet, size_t packet_size);
 
-    AudioPacketHeaderWiiU *header;
+    AudioPacketHeaderWiiU header;
     const static unsigned int TYPE_AUDIO = 0;
     const static unsigned int TYPE_VIDEO = 1;
-    AudioPacketVideoFormatWiiU *header_video_format;
+    AudioPacketVideoFormatWiiU header_video_format;
+
+    unsigned char* payload;
 };
 
 

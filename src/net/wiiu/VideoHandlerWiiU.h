@@ -15,7 +15,7 @@ class VideoHandlerWiiU : PacketHandler {
 public:
     VideoHandlerWiiU();
 
-    bool is_idr_packet(VideoPacketHeaderWiiU *header);
+    bool is_idr_packet(const VideoPacketHeaderWiiU& header);
 
 private:
     bool is_streaming;

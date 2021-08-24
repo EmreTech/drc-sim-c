@@ -29,12 +29,12 @@ void VideoHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockadd
     const VideoPacketWiiU &video_packet = VideoPacketWiiU(packet, packet_size);
     bool is_idr = is_idr_packet(video_packet.header);
 
-    bool seq_ok = update_seq_id(video_packet.header->seq_id);
+    bool seq_ok = update_seq_id(video_packet.header.seq_id);
 
     if (!seq_ok)
         is_streaming = false;
 
-    if (video_packet.header->frame_begin) {
+    if (video_packet.header.frame_begin) {
         memset(frame, 0, sizeof(frame));
         frame_index = 0;
         if (!is_streaming) {
@@ -48,10 +48,10 @@ void VideoHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockadd
         }
     }
 
-    memcpy(frame + frame_index, video_packet.header->payload, video_packet.header->payload_size);
-    frame_index += video_packet.header->payload_size;
+    memcpy(frame + frame_index, video_packet.payload, video_packet.header.payload_size);
+    frame_index += video_packet.header.payload_size;
 
-    if (is_streaming and video_packet.header->frame_end) {
+    if (is_streaming and video_packet.header.frame_end) {
         uint8_t *nals = new uint8_t[frame_index * 2];
         int nals_size = h264_nal_encapsulate(is_idr, frame, frame_index, nals);
 
@@ -67,14 +67,14 @@ void VideoHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockadd
         delete [] image_rgb;
         delete [] image_jpeg;
     }
-    else if (video_packet.header->frame_end and !is_streaming) {
+    else if (video_packet.header.frame_end and !is_streaming) {
         Logger::debug(Logger::VIDEO, "Skipping video frame");
     }
 }
 
-bool VideoHandlerWiiU::is_idr_packet(VideoPacketHeaderWiiU *header) {
-    for (int byte = 0; byte < sizeof(header->extended_header); ++byte) {
-        if (header->extended_header[byte] == 0x80) {
+bool VideoHandlerWiiU::is_idr_packet(const VideoPacketHeaderWiiU& header) {
+    for (int byte = 0; byte < sizeof(header.extended_header); ++byte) {
+        if (header.extended_header[byte] == 0x80) {
             return true;
         }
     }
