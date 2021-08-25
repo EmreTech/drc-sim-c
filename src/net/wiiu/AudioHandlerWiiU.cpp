@@ -14,6 +14,11 @@
 #include "../../Input.h"
 
 AudioHandlerWiiU::AudioHandlerWiiU() {
+    last_ts = 0;
+    last_uts = 0;
+    ts_wrap_ref = 0;
+    initial_ts = 0;
+
     rand_audio = new unsigned char[512];
     for (int byte = 0; byte < 512; ++byte)
       rand_audio[byte] = (unsigned char) (rand() % 255);
@@ -32,10 +37,39 @@ void AudioHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockadd
         return;
     }
 
+    if (!initial_ts) {
+        initial_ts = audio_packet.header.timestamp;
+    }
+
     if (audio_packet.header.vibrate)
         Server::broadcast_command(CommandPacketServer::COMMAND_INPUT_VIBRATE);
 
-    Server::broadcast_audio(audio_packet.payload, audio_packet.header.payload_size);
+    const size_t data_size = audio_packet.header.payload_size;
+    void* data = av_malloc(data_size);
+    memcpy(data, audio_packet.payload, data_size);
+
+    AVPacket* pkt = av_packet_alloc();
+    av_packet_from_data(pkt, (uint8_t*)data, data_size);
+
+    uint32_t uts = audio_packet.header.timestamp - initial_ts;
+    int64_t ts = uts + ts_wrap_ref;
+    if (ts < last_ts) {
+        ts_wrap_ref = last_ts + (0xFFFFFFFF - last_uts);
+        ts = uts + ts_wrap_ref;
+    } else {
+        last_uts = uts;
+        last_ts = ts;
+    }
+
+    pkt->dts = ts;
+    pkt->pts = ts;
+
+    AVRational tb = {
+        .num = 1,
+        .den = 1000000,
+    };
+
+    Server::broadcast_audio(pkt, tb);
 
     if (Input::get_mic_blow_input())
         send_mic_blow();

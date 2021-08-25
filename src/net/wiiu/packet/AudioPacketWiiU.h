@@ -17,7 +17,7 @@ typedef struct {
     unsigned type;
     unsigned seq_id;
     unsigned payload_size;
-    unsigned timestamp;
+    unsigned int timestamp;
 } AudioPacketHeaderWiiU;
 #pragma pack(0)
 

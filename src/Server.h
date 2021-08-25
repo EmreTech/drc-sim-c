@@ -37,6 +37,8 @@ public:
     static int socket_cmd;
 
     static void broadcast_video(AVPacket* pkt, AVRational time_base);
+    static void broadcast_audio(AVPacket* pkt, AVRational time_base);
+
 
     static const int VIDEO = 0;
     static const int AUDIO = 1;
@@ -45,8 +47,6 @@ public:
     static void register_client_socket(in_port_t port, in_addr_t addr, const int type);
 
     static void update_socket_time(in_port_t port, in_addr_t addr);
-
-    static void broadcast_audio(unsigned char *data, size_t size);
 
     static void broadcast_command(uint16_t command_id);
 

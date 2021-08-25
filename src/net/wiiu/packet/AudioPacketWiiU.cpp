@@ -18,7 +18,7 @@ AudioPacketWiiU::AudioPacketWiiU(unsigned char *packet, size_t packet_size) : Pa
 
     header.payload_size = (packet[2] << 8) | packet[3];
 
-    header.timestamp = (packet[4] << 24) | (packet[5] << 16) | (packet[6] << 8) | packet[7];
+    header.timestamp = (packet[7] << 24) | (packet[6] << 16) | (packet[5] << 8) | packet[4];
 
     payload = packet + 8;
     assert(header.payload_size <= packet_size - 8);
