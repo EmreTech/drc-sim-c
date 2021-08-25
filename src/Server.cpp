@@ -6,6 +6,7 @@
 #include <zconf.h>
 #include "Server.h"
 #include "util/logging/Logger.h"
+#include "util/Args.h"
 #include "data/Constants.h"
 #include "Gamepad.h"
 #include "net/server/packet/CommandPacketServer.h"
@@ -65,7 +66,7 @@ void Server::run() {
   astcp->channels = 2;
   astcp->sample_rate = 48000;
 
-  int ret = avio_open(&avf->pb, "video", AVIO_FLAG_WRITE);
+  int ret = avio_open(&avf->pb, Args::filename, AVIO_FLAG_WRITE);
   if (ret < 0) abort();
 
   ret = avformat_write_header(avf, NULL);

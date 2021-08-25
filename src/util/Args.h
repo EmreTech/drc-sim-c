@@ -14,6 +14,8 @@ class Args {
 public:
     static void parse_args(int argc, char **argv);
 
+    static char* filename;
+
     static char *region;
     static int log_level;
     static int video_quality;

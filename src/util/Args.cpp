@@ -8,6 +8,7 @@
 #include "../data/Constants.h"
 
 char* Args::region;
+char* Args::filename;
 int Args::log_level;
 int Args::video_quality;
 timespec Args::input_delay;
@@ -46,7 +47,10 @@ void Args::parse_args(int argc, char **argv) {
     // Input
     input_delay.tv_sec = 0;
     input_delay.tv_nsec = get_int("-input-delay", 0, 1000, 100) * 1000000; // milliseconds to nanoseconds
+    // filename
+    filename = get_arg("-filename", "video");
     // Log args
+    Logger::info(Logger::CONFIG, "File: %s", filename);
     Logger::info(Logger::CONFIG, "Region: %s", region);
     Logger::info(Logger::CONFIG, "Input delay: %dms", input_delay.tv_nsec / 1000000);
     Logger::info(Logger::CONFIG, "Video quality: %d%%", video_quality);
