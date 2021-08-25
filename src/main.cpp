@@ -35,6 +35,7 @@ void run() {
     gamepad_thread.join();
     server_thread.join();
     input_thread.join();
+    Server::cleanup();
 }
 
 void log_level() {

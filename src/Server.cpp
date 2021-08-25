@@ -2,9 +2,7 @@
 // Created by rolando on 5/16/17.
 //
 
-#include <netinet/in.h>
 #include <cstring>
-#include <arpa/inet.h>
 #include <zconf.h>
 #include "Server.h"
 #include "util/logging/Logger.h"
@@ -13,16 +11,50 @@
 #include "net/server/packet/CommandPacketServer.h"
 #include <fcntl.h>
 
+extern "C" {
+  #include <libavcodec/avcodec.h>
+  #include <libavformat/avformat.h>
+}
+
 using namespace std;
 
-int fifo;
+AVFormatContext* avf;
 
 Server::Server() {
 
 }
 
 void Server::run() {
-  fifo = open("video", O_RDWR, O_NONBLOCK);
+  AVOutputFormat* of = av_guess_format("mpegts", NULL, NULL);
+  if (!of) abort(); //todo real error handling
+
+  avf = avformat_alloc_context();
+  if (!avf) abort();
+
+  avf->oformat = of;
+
+  AVStream* st = avformat_new_stream(avf, NULL);
+  if (!st) abort();
+
+  AVCodecParameters* stcp = st->codecpar;
+  stcp->codec_id = AV_CODEC_ID_H264;
+  stcp->codec_type = AVMEDIA_TYPE_VIDEO;
+  stcp->width = 854;
+  stcp->height = 480;
+
+  int ret = avio_open(&avf->pb, "video", AVIO_FLAG_WRITE);
+  if (ret < 0) abort();
+
+  ret = avformat_write_header(avf, NULL);
+  if (ret < 0) abort();
+  printf("a %d\n", ret);
+}
+
+void Server::cleanup() {
+  av_write_trailer(avf);
+  avio_close(avf->pb);
+
+  avformat_free_context(avf);
 }
 
 void Server::check_socket_time() {
@@ -41,8 +73,10 @@ void Server::init_sockets() {
 
 }
 
-void Server::broadcast_video(uint8_t *frame, size_t size) {
-    broadcast_media(frame, size, VIDEO);
+void Server::broadcast_video(AVPacket* pkt, AVRational time_base) {
+  pkt->stream_index = 0;
+  av_packet_rescale_ts(pkt, time_base, avf->streams[pkt->stream_index]->time_base);
+  av_interleaved_write_frame(avf, pkt);
 }
 
 void Server::handle_packet(int fd, PacketHandler *handler) {
@@ -74,7 +108,7 @@ void Server::broadcast_command(uint16_t command_id) {
 }
 
 void Server::broadcast_media(unsigned char *data, size_t size, const int type) {
-  write(fifo, data, size);
+  //write(fifo, data, size);
 }
 
 void Server::broadcast_command(unsigned char *packet, size_t packet_size) {

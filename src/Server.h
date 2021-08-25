@@ -11,6 +11,11 @@
 #include "net/PacketHandler.h"
 #include "net/server/packet/CommandPacketServer.h"
 
+extern "C" {
+  #include <libavformat/avformat.h>
+}
+
+
 typedef struct {
     int type;
     int fd;
@@ -25,12 +30,13 @@ class Server {
 public:
     Server();
     static void run();
+    static void cleanup();
 
     static int socket_vid;
     static int socket_aud;
     static int socket_cmd;
 
-    static void broadcast_video(uint8_t *frame, size_t size);
+    static void broadcast_video(AVPacket* pkt, AVRational time_base);
 
     static const int VIDEO = 0;
     static const int AUDIO = 1;

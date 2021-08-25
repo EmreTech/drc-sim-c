@@ -16,7 +16,7 @@ typedef struct {
     bool frame_end;
     bool has_timestamp;
     unsigned payload_size;
-    unsigned timestamp;
+    unsigned int timestamp;
     unsigned char extended_header[8]; // Extended header
 } VideoPacketHeaderWiiU;
 

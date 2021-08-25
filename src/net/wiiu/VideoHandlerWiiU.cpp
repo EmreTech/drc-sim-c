@@ -15,12 +15,20 @@
 #include "../../Gamepad.h"
 #include "../../data/Constants.h"
 
+extern "C" {
+  #include <libavcodec/avcodec.h>
+  #include <libavformat/avformat.h>
+}
+
 using namespace std;
 
 VideoHandlerWiiU::VideoHandlerWiiU() {
     frame = new uint8_t[100000];
     frame_index = 0;
     frame_decode_num = 0;
+    frame_ts = 0;
+    last_ts = 0;
+    ts_wrap_ref = 0;
 }
 
 void VideoHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockaddr_in *from_address,
@@ -36,10 +44,17 @@ void VideoHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockadd
     if (video_packet.header.frame_begin) {
         memset(frame, 0, sizeof(frame));
         frame_index = 0;
+        if (video_packet.header.has_timestamp) {
+            frame_ts = video_packet.header.timestamp;
+        } else {
+            Logger::error(Logger::VIDEO, "No timestamp on start!");
+        }
         if (!is_streaming) {
-            if (is_idr)
+            if (is_idr) {
+                initial_ts = video_packet.header.timestamp;
+                ts_wrap_ref = 0;
                 is_streaming = true;
-            else {
+            } else {
                 unsigned char idr_request[] = {1, 0, 0, 0}; // Undocumented
                 Gamepad::sendwiiu(Gamepad::socket_msg, idr_request, sizeof(idr_request), PORT_WII_MSG);
                 return;
@@ -51,12 +66,34 @@ void VideoHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockadd
     frame_index += video_packet.header.payload_size;
 
     if (is_streaming and video_packet.header.frame_end) {
-        uint8_t *nals = new uint8_t[frame_index * 2];
+        uint8_t *nals = (uint8_t*)av_malloc(frame_index * 2);
         int nals_size = h264_nal_encapsulate(is_idr, frame, frame_index, nals);
 
-        Server::broadcast_video(nals, (size_t) nals_size, is_idr);
+        AVPacket* pkt = av_packet_alloc();
 
-        delete [] nals;
+        int ret = av_packet_from_data(pkt, nals, nals_size);
+
+        uint32_t uts = frame_ts - initial_ts;
+        int64_t ts = uts + ts_wrap_ref;
+        if (ts < last_ts) {
+            ts_wrap_ref = last_ts + (0xFFFFFFFF - last_uts);
+            ts = uts + ts_wrap_ref;
+        } else {
+            last_uts = uts;
+            last_ts = ts;
+        }
+
+        pkt->dts = ts;
+        pkt->pts = ts;
+
+        pkt->flags |= is_idr ? AV_PKT_FLAG_KEY : 0;
+
+        AVRational tb = {
+          .num = 1,
+          .den = 1000000,
+        };
+
+        Server::broadcast_video(pkt, tb);
     }
     else if (video_packet.header.frame_end and !is_streaming) {
         Logger::debug(Logger::VIDEO, "Skipping video frame");
