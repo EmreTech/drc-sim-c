@@ -19,10 +19,7 @@ public:
 
     unsigned char *rand_audio;
 
-    uint32_t initial_ts;
-    uint32_t last_uts;
-    int64_t last_ts;
-    int64_t ts_wrap_ref;
+    int64_t sample_counter;
 };
 
 

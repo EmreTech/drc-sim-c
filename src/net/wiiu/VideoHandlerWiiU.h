@@ -19,11 +19,6 @@ public:
 private:
     bool is_streaming;
     uint32_t frame_index;
-    uint32_t frame_ts;
-    uint32_t initial_ts;
-    int64_t ts_wrap_ref;
-    int64_t last_ts;
-    uint32_t last_uts;
 
     int h264_nal_encapsulate(bool is_idr, uint8_t *frame, size_t frame_size, uint8_t *nals);
 
@@ -31,7 +26,7 @@ private:
                 unsigned int *address_size) override;
 
     uint8_t *frame;
-    int frame_decode_num;
+    int64_t frame_decode_num;
 };
 
 

@@ -26,9 +26,6 @@ VideoHandlerWiiU::VideoHandlerWiiU() {
     frame = new uint8_t[100000];
     frame_index = 0;
     frame_decode_num = 0;
-    frame_ts = 0;
-    last_ts = 0;
-    ts_wrap_ref = 0;
 }
 
 void VideoHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockaddr_in *from_address,
@@ -44,15 +41,8 @@ void VideoHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockadd
     if (video_packet.header.frame_begin) {
         memset(frame, 0, sizeof(frame));
         frame_index = 0;
-        if (video_packet.header.has_timestamp) {
-            frame_ts = video_packet.header.timestamp;
-        } else {
-            Logger::error(Logger::VIDEO, "No timestamp on start!");
-        }
         if (!is_streaming) {
             if (is_idr) {
-                initial_ts = video_packet.header.timestamp;
-                ts_wrap_ref = 0;
                 is_streaming = true;
             } else {
                 unsigned char idr_request[] = {1, 0, 0, 0}; // Undocumented
@@ -73,24 +63,12 @@ void VideoHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockadd
 
         int ret = av_packet_from_data(pkt, nals, nals_size);
 
-        uint32_t uts = frame_ts - initial_ts;
-        int64_t ts = uts + ts_wrap_ref;
-        if (ts < last_ts) {
-            ts_wrap_ref = last_ts + (0xFFFFFFFF - last_uts);
-            ts = uts + ts_wrap_ref;
-        } else {
-            last_uts = uts;
-            last_ts = ts;
-        }
-
-        pkt->dts = ts;
-        pkt->pts = ts;
-
-        pkt->flags |= is_idr ? AV_PKT_FLAG_KEY : 0;
+        pkt->pts = frame_decode_num;
+        pkt->dts = frame_decode_num;
 
         AVRational tb = {
-          .num = 1,
-          .den = 1000000,
+          .num = 100,
+          .den = 5994,
         };
 
         Server::broadcast_video(pkt, tb);
