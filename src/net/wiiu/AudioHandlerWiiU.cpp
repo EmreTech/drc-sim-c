@@ -5,13 +5,16 @@
 #include <cstring>
 #include <arpa/inet.h>
 #include "AudioHandlerWiiU.h"
-#include "../../Server.h"
 #include "packet/AudioPacketWiiU.h"
 #include "../../util/logging/Logger.h"
 #include "../../util/BitUtil.h"
 #include "../../Gamepad.h"
 #include "../../data/Constants.h"
 #include "../../Input.h"
+
+extern "C" {
+  #include <libavformat/avformat.h>
+}
 
 AudioHandlerWiiU::AudioHandlerWiiU() {
     sample_counter = 0;
@@ -34,8 +37,10 @@ void AudioHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockadd
         return;
     }
 
+    /*
     if (audio_packet.header.vibrate)
         Server::broadcast_command(CommandPacketServer::COMMAND_INPUT_VIBRATE);
+    */
 
     const size_t data_size = audio_packet.header.payload_size;
     void* data = av_malloc(data_size);
@@ -52,7 +57,7 @@ void AudioHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockadd
         .den = 48000/*kHz*/ * 2/*16-bit samples*/ * 2/*channels*/,
     };
 
-    Server::broadcast_audio(pkt, tb);
+    //Server::broadcast_audio(pkt, tb);
 
     sample_counter += audio_packet.header.payload_size;
 

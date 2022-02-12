@@ -16,12 +16,10 @@ set(SOURCE_FILES src/main.cpp src/util/Args.cpp src/util/Args.h
         src/Gamepad.cpp src/Gamepad.h src/net/wiiu/VideoHandlerWiiU.cpp src/net/wiiu/VideoHandlerWiiU.h
         src/net/wiiu/packet/VideoPacketWiiU.cpp src/net/wiiu/packet/VideoPacketWiiU.h
         src/util/BitUtil.h src/net/wiiu/CommandHandlerWiiU.cpp src/net/wiiu/CommandHandlerWiiU.h
-        src/net/PacketHandler.cpp src/net/PacketHandler.h src/Server.cpp
-        src/Server.h src/net/wiiu/AudioHandlerWiiU.cpp src/net/wiiu/AudioHandlerWiiU.h src/net/wiiu/HidHandlerWiiU.cpp
+        src/net/PacketHandler.cpp src/net/PacketHandler.h
+        src/net/wiiu/AudioHandlerWiiU.cpp src/net/wiiu/AudioHandlerWiiU.h src/net/wiiu/HidHandlerWiiU.cpp
         src/net/wiiu/HidHandlerWiiU.h src/net/wiiu/MessageHandlerWiiU.cpp src/net/wiiu/MessageHandlerWiiU.h
-        src/net/server/CommandHandlerServer.cpp src/net/server/CommandHandlerServer.h
-        src/net/server/packet/CommandPacketServer.cpp src/net/server/packet/CommandPacketServer.h src/net/Packet.cpp
-        src/net/Packet.h src/net/wiiu/packet/CommandPacketWiiU.cpp
+        src/net/Packet.cpp src/net/Packet.h src/net/wiiu/packet/CommandPacketWiiU.cpp
         src/net/wiiu/packet/CommandPacketWiiU.h src/util/Resource.cpp src/util/Resource.h
         src/net/wiiu/packet/AudioPacketWiiU.cpp src/net/wiiu/packet/AudioPacketWiiU.h src/Input.cpp src/Input.h
         src/net/wiiu/packet/InputPacketWiiU.cpp src/net/wiiu/packet/InputPacketWiiU.h)

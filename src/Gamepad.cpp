@@ -3,6 +3,7 @@
 //
 
 #include <string>
+#include <sys/select.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -49,29 +50,29 @@ void Gamepad::connect() {
     // CMD
     address.sin_port = htons(PORT_WII_CMD);
     socket_cmd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (bind(socket_cmd, (const sockaddr *) &address, sizeof(address)) == -1)
+    if (::bind(socket_cmd, (const sockaddr *) &address, sizeof(address)) == -1)
         Logger::error(Logger::DRC, "Could not bind CMD socket.");
     // AUD
     address.sin_port = htons(PORT_WII_AUD);
     socket_aud = socket(AF_INET, SOCK_DGRAM, 0);
     if (!Args::disable_audio)
-        if (bind(socket_aud, (const sockaddr *) &address, sizeof(address)) == -1)
+        if (::bind(socket_aud, (const sockaddr *) &address, sizeof(address)) == -1)
             Logger::error(Logger::DRC, "Could not bind AUD socket.");
     // VID
     address.sin_port = htons(PORT_WII_VID);
     socket_vid = socket(AF_INET, SOCK_DGRAM, 0);
     if (!Args::disable_video)
-        if (bind(socket_vid, (const sockaddr *) &address, sizeof(address)) == -1)
+        if (::bind(socket_vid, (const sockaddr *) &address, sizeof(address)) == -1)
             Logger::error(Logger::DRC, "Could not bind VID socket.");
     // MSG
     address.sin_port = htons(PORT_WII_MSG);
     socket_msg = socket(AF_INET, SOCK_DGRAM, 0);
-    if (bind(socket_msg, (const sockaddr *) &address, sizeof(address)) == -1)
+    if (::bind(socket_msg, (const sockaddr *) &address, sizeof(address)) == -1)
         Logger::error(Logger::DRC, "Could not bind MSG socket.");
     // HID
     address.sin_port = htons(PORT_WII_HID);
     socket_hid = socket(AF_INET, SOCK_DGRAM, 0);
-    if (bind(socket_hid, (const sockaddr *) &address, sizeof(address)) == -1)
+    if (::bind(socket_hid, (const sockaddr *) &address, sizeof(address)) == -1)
         Logger::error(Logger::DRC, "Could not bind HID socket.");
 }
 

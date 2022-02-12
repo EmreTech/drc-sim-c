@@ -2,6 +2,7 @@
 // Created by rolando on 5/27/17.
 //
 
+#include <stdint.h>
 #include <ctime>
 #include <netinet/in.h>
 #include <iostream>
@@ -20,7 +21,7 @@ InputMicBlow *Input::input_mic_blow;
 
 Input::Input() {
     HID_UPDATE_INTERVAL.tv_sec = 0;
-    HID_UPDATE_INTERVAL.tv_nsec = (__syscall_slong_t) 5 * 1000 * 1000;
+    HID_UPDATE_INTERVAL.tv_nsec = (long) 5 * 1000 * 1000;
     packet = new InputPacketHeaderWiiU();
     clock_gettime(CLOCK_MONOTONIC_RAW, &last_sent_time);
     input_button = new InputButton();

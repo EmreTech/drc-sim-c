@@ -5,7 +5,6 @@
 #include "util/logging/Logger.h"
 #include "data/Constants.h"
 #include "Gamepad.h"
-#include "Server.h"
 #include "Input.h"
 
 void initialize_loggers();
@@ -30,12 +29,9 @@ int main(int argc, char **args) {
 
 void run() {
     thread gamepad_thread(Gamepad::run);
-    thread server_thread(Server::run);
     thread input_thread(Input::run);
     gamepad_thread.join();
-    server_thread.join();
     input_thread.join();
-    Server::cleanup();
 }
 
 void log_level() {

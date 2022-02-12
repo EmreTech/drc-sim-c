@@ -6,7 +6,8 @@
 #define DRC_SIM_C_INPUTPACKETWIIU_H
 
 
-#include <stdint-gcc.h>
+//#include <stdint-gcc.h>
+#include <stdint.h>
 
 #pragma pack(1)
 

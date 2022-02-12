@@ -11,7 +11,6 @@
 #include <unistd.h>
 #include "VideoHandlerWiiU.h"
 #include "../../util/logging/Logger.h"
-#include "../../Server.h"
 #include "../../Gamepad.h"
 #include "../../data/Constants.h"
 
@@ -71,7 +70,7 @@ void VideoHandlerWiiU::update(unsigned char *packet, size_t packet_size, sockadd
           .den = 5994,
         };
 
-        Server::broadcast_video(pkt, tb);
+        //Server::broadcast_video(pkt, tb);
     }
     else if (video_packet.header.frame_end and !is_streaming) {
         Logger::debug(Logger::VIDEO, "Skipping video frame");

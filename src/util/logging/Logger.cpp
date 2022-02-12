@@ -92,9 +92,11 @@ void Logger::error(const string log_name, const string message, ...) {
     va_list args;
     va_start(args, 0);
     log(log_name, ERROR, message, args);
+    /*
     char buf[256];
     char *error_message = strerror_r(errno, buf, 256);
     debug(log_name, error_message);
+    */
     exit(errno);
 }
 
